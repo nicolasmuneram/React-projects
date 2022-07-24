@@ -55,6 +55,7 @@ function Square(props) {
       this.state = {
         history: [{
           squares: Array(9).fill(null),
+          lastMove:{}
         }],
         xIsNext: true,
         stepNumber: 0,
@@ -65,16 +66,19 @@ function Square(props) {
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length -1];
       const squares = current.squares.slice();
-      if (calculateWinner(squares) || squares[i]){
 
+      if (calculateWinner(squares) || squares[i]){
         return;
-    }
-    squares[i] = this.state.xIsNext ? "X" : "O" ;
-    this.setState({
-        history: history.concat([{ squares: squares,}]),
-        stepNumber:history.length,
-        xIsNext: !this.state.xIsNext,
-    });
+      }
+      squares[i] = this.state.xIsNext ? "X" : "O" ;
+      this.setState({
+          history: history.concat([{ squares: squares,lastMove: determineColAndRow(i)}]),
+          stepNumber:history.length,
+          xIsNext: !this.state.xIsNext,
+      });
+
+      //console.log(this.state.history[this.state.stepNumber].lastMove)
+
 
     }
 
@@ -89,11 +93,10 @@ function Square(props) {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
-
       const moves = history.map((step, move) => {
 
         const desc = move ? 
-        "Go to move #" + move :
+        "Go to move #" + move + " => Col: "+ this.state.history[move].lastMove.column + " and row: " + this.state.history[move].lastMove.row:
         "Go to game start";
         return (
           <li key = {move}>
@@ -109,6 +112,12 @@ function Square(props) {
       }else{
           status = 'Next player is: ' + (this.state.xIsNext ? "X" : "O");
       }
+      console.log(this.state.stepNumber )
+
+      if (this.state.stepNumber > 8 && !winner){
+        status = "There is a tie, restart the game!"
+      }
+
       return (
         <div className="game">
           <div className="game-board">
@@ -149,4 +158,11 @@ function Square(props) {
       }
     }
     return null;
+  }
+
+  function determineColAndRow(num){
+    const col = num % 3;
+    const row = Math.floor(num/3);
+
+    return {"column" : col+1, "row": row +1};
   }
