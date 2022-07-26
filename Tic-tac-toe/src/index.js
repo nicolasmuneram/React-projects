@@ -19,31 +19,31 @@ function Square(props) {
         return (
             <Square 
                 value={this.props.squares[i]} 
+                key={"square " + i}
                 onClick= { () => this.props.onClick(i)}
             />
         );
     }
 
+
   
     render() {
+
+      const board =[] 
+      const rows = []
+      let idSquare = 0;
+      for (let i = 1; i <= 3; i++){
+        for (let j = 1; j <= 3; j++){
+          rows.push(this.renderSquare(idSquare));
+          idSquare++;
+          console.log((idSquare))
+        }
+        board.push(<div className="board-row" key = {i}>{rows.slice(idSquare-3,idSquare)}</div>)
+      }
+      console.log(rows);
+
         return (
-            <div>
-            <div className="board-row">
-                {this.renderSquare(0)}
-                {this.renderSquare(1)}
-                {this.renderSquare(2)}
-            </div>
-            <div className="board-row">
-                {this.renderSquare(3)}
-                {this.renderSquare(4)}
-                {this.renderSquare(5)}
-            </div>
-            <div className="board-row">
-                {this.renderSquare(6)}
-                {this.renderSquare(7)}
-                {this.renderSquare(8)}
-            </div>
-            </div>
+         board
         );
     }
   }
@@ -93,17 +93,28 @@ function Square(props) {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
+      
       const moves = history.map((step, move) => {
-
+        
         const desc = move ? 
         "Go to move #" + move + " => Col: "+ this.state.history[move].lastMove.column + " and row: " + this.state.history[move].lastMove.row:
         "Go to game start";
-        return (
-          <li key = {move}>
-            <button onClick={() => this.jumpTo(move)}> {desc} </button>
-          </li>
-        );
+        if (move !== this.state.stepNumber){
+          return (
+            <li key = {move}>
+              <button onClick={() => this.jumpTo(move)}> {desc} </button>
+            </li>
+          );
+        }  else { 
+          return (
+            <li key = {move}> 
+              <button onClick={() => this.jumpTo(move)}> <b>{desc}</b> </button>
+            </li>
+          )
+        }
+          
       });
+      
 
       let status
 
@@ -112,7 +123,7 @@ function Square(props) {
       }else{
           status = 'Next player is: ' + (this.state.xIsNext ? "X" : "O");
       }
-      console.log(this.state.stepNumber )
+
 
       if (this.state.stepNumber > 8 && !winner){
         status = "There is a tie, restart the game!"
